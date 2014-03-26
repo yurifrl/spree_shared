@@ -11,21 +11,47 @@ namespace :spree_shared do
 
       #create the database
       puts "Creating database: #{db_name}"
-      ActiveRecord::Base.establish_connection #make sure we're talkin' to db
-      ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
-      Apartment::Database.create db_name
+
+      config = YAML::load(File.open('config/database.yml'))
+
+      env = ENV["RAILS_ENV"] || "development"
+
+      begin
+        ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
+        ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
+        Apartment::Database.create db_name
+      rescue Exception => e
+        puts e.backtrace
+      end
+
+      puts "Creating asset directories"
+
+      templates_base_path = File.join Rails.root, 'app', 'tenants', db_name, 'themes', 'basic'
+
+      views = File.join templates_base_path, 'views'
+      FileUtils.mkdir_p views unless File.exist? views
+
+      images = File.join templates_base_path, 'images'
+      FileUtils.mkdir_p images unless File.exist? images
+
+      css = File.join templates_base_path, 'stylesheets'
+      FileUtils.mkdir_p css unless File.exist? css
+      FileUtils.touch File.join(css, "main.css")
+
+      js = File.join templates_base_path, 'javascripts'
+      FileUtils.mkdir_p js unless File.exist? js
+      FileUtils.touch File.join(js, "main.js")
 
       #seed and sample it
       puts "Loading seed & sample data into database: #{db_name}"
-      ENV['RAILS_CACHE_ID'] = db_name 
+      ENV['RAILS_CACHE_ID'] = db_name
       Apartment::Database.process(db_name) do
         Spree::Image.change_paths db_name
 
         ENV['AUTO_ACCEPT'] = 'true'
         ENV['SKIP_NAG'] = 'yes'
 
-        Rake::Task["db:seed"].invoke 
-        Rake::Task["spree_sample:load"].invoke 
+        Rake::Task["db:seed"].invoke
 
         store_name = db_name.humanize.titleize
         Spree::Config.set :site_name => store_name
@@ -44,51 +70,6 @@ namespace :spree_shared do
             admin.roles << role
             admin.save
           end
-        end
-
-        # load some extra sample data for spree_fancy
-        tags      = Spree::Taxonomy.create(:name => 'Tags')
-        slider    = Spree::Taxon.create({:taxonomy_id => tags.id, :name => 'Slider'})
-        featured  = Spree::Taxon.create({:taxonomy_id => tags.id, :name => 'Featured'})
-        latest    = Spree::Taxon.create({:taxonomy_id => tags.id, :name => 'Latest'})
-
-        products = Spree::Product.all
-        products[0..6].each do |product|
-          product.taxons << slider
-        end
-        products[4..16].each do |product|
-          product.taxons << featured
-        end
-        products[0..12].each do |product|
-          product.taxons << latest
-        end
-
-
-        # create payments based on the totals since they can't be known in YAML (quantities are random)
-        method = Spree::PaymentMethod.where(:name => 'Credit Card', :active => true, :environment => 'production').first
-
-        # Hack the current method so we're able to return a gateway without a RAILS_ENV
-        Spree::Gateway.class_eval do
-          def self.current
-            Spree::Gateway::Bogus.new
-          end
-        end
-
-        # This table was previously called spree_creditcards, and older migrations
-        # reference it as such. Make it explicit here that this table has been renamed.
-        Spree::CreditCard.table_name = 'spree_credit_cards'
-
-        creditcard = Spree::CreditCard.create(:cc_type => 'visa', :month => 12, :year => 2014, :last_digits => '1111',
-                                                :first_name => 'Sean', :last_name => 'Schofield',
-                                                :gateway_customer_profile_id => 'BGS-1234')
-        Spree::Order.all.each_with_index do |order, index|
-          order.update!
-          order.payments.delete_all
-          payment = order.payments.create!(:amount => order.total, :source => creditcard.clone, :payment_method => method)
-          payment.update_attributes_without_callbacks({
-            :state => 'pending',
-            :response_code => '12345'
-          })
         end
 
         puts "Bootstrap completed successfully"
