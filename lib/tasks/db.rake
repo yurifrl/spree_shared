@@ -1,3 +1,5 @@
+Apartment.db_migrate_tenants = false
+
 namespace :spree_shared do
   desc "Bootstraps single database."
   task :bootstrap, [:db_name] => [:environment] do |t, args|
@@ -120,6 +122,21 @@ namespace :spree_shared do
       Apartment::Database.process(db_name) do
         Spree::Image.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
+      end
+    end
+  end
+
+  esc "Seed data"
+  task :seed, [:db_name] => [:environment] do |t,args|
+    if args[:db_name].blank?
+      puts %q{You must supply db_name, with "rake spree_shared:seed['the_db_name']"}
+    else
+      db_name = args[:db_name]
+      #convert name to postgres friendly name
+      db_name.gsub!('-','_')
+
+      Apartment::Database.process(db_name) do
+        Rake::Task["db:seed"].invoke
       end
     end
   end
