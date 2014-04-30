@@ -1,4 +1,6 @@
-Apartment.db_migrate_tenants = false
+Apartment.configure do |config|
+  config.tenant_names = []
+end
 
 namespace :spree_shared do
   desc "Bootstraps single database."
