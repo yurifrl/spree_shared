@@ -19,25 +19,30 @@ module Apartment
           begin
             database.gsub! '-', '_'
 
-            Apartment::Database.switch database
+            ActiveRecord::Base.establish_connection
+            result = ActiveRecord::Base.execute("SELECT id from public.customers where domain = '#{database}' and status = true")
 
-            Rails.logger.error "  Using database '#{database}'"
+            if result.length > 0
 
-            Spree.config do |config|
-              # Example:
-              # Uncomment to override the default site name.
-              # config.site_name = "Spree Demo Site"
-              config.allow_ssl_in_production = false
+              Apartment::Database.switch database
+
+              Rails.logger.error "  Using database '#{database}'"
+
+              Spree.config do |config|
+                config.allow_ssl_in_production = false
+              end
+
+              #set image location
+              Spree::Image.change_paths database
+
+              #namespace cache keys
+              ENV['RAILS_CACHE_ID']= database
+
+              #reset Mail settings
+              Spree::Core::MailSettings.init
+            else
+              raise "Client is not active"
             end
-
-            #set image location
-            Spree::Image.change_paths database
-
-            #namespace cache keys
-            ENV['RAILS_CACHE_ID']= database
-
-            #reset Mail settings
-            Spree::Core::MailSettings.init
           rescue Exception => e
             Rails.logger.error "  Stopped request due to: #{e.message}"
 

@@ -79,4 +79,33 @@ namespace :spree_shared do
 
   end
 
+  desc "Migrate schema to version 0 and back up again. WARNING: Destroys all data in tables!!"
+  task :remigrate, [:db_name] => [:environment] do |t,args|
+    if args[:db_name].blank?
+      puts %q{You must supply db_name, with "rake spree_shared:remigrate['the_db_name']"}
+    else
+      db_name = args[:db_name]
+
+      #convert name to postgres friendly name
+      db_name.gsub!('-','_')
+      require 'highline/import'
+
+      if ENV['SKIP_NAG'] or ENV['OVERWRITE'].to_s.downcase == 'true' or agree("This task will destroy any data in the database. Are you sure you want to \ncontinue? [y/n] ")
+      Apartment::Database.process(db_name) do
+        # Drop all tables
+        ActiveRecord::Base.connection.tables.each { |t| ActiveRecord::Base.connection.drop_table t }
+
+        # Migrate upward
+        Rake::Task["db:migrate"].invoke
+
+        # Dump the schema
+        Rake::Task["db:schema:dump"].invoke
+      end
+      else
+        say "Task cancelled."
+        exit
+      end
+    end
+  end
+
 end
