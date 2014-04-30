@@ -16,6 +16,10 @@ namespace :spree_shared do
 
       env = ENV["RAILS_ENV"] || "development"
 
+      Apartment.configure do |config|
+        config.tenant_names = []
+      end
+
       begin
         ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
         ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
@@ -122,6 +126,10 @@ namespace :spree_shared do
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
 
+      Apartment.configure do |config|
+        config.tenant_names = []
+      end
+
       Apartment::Database.process(db_name) do
         Spree::Image.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
@@ -137,6 +145,10 @@ namespace :spree_shared do
       db_name = args[:db_name]
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
+
+      Apartment.configure do |config|
+        config.tenant_names = []
+      end
 
       Apartment::Database.process(db_name) do
         Rake::Task["db:seed"].invoke
