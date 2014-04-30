@@ -22,7 +22,7 @@ module Apartment
             ActiveRecord::Base.establish_connection
             result = ActiveRecord::Base.connection.execute("SELECT id from public.customers where domain = '#{database}' and status = true")
 
-            if result.length > 0
+            if result.ntuples > 0
 
               Apartment::Database.switch database
 
