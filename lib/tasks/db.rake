@@ -126,7 +126,7 @@ namespace :spree_shared do
     end
   end
 
-  esc "Seed data"
+  desc "Seed data"
   task :seed, [:db_name] => [:environment] do |t,args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:seed['the_db_name']"}
