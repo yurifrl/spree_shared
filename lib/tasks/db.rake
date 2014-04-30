@@ -1,7 +1,3 @@
-Apartment.configure do |config|
-  config.tenant_names = []
-end
-
 namespace :spree_shared do
   desc "Bootstraps single database."
   task :bootstrap, [:db_name] => [:environment] do |t, args|
@@ -92,6 +88,11 @@ namespace :spree_shared do
 
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
+
+      Apartment.configure do |config|
+        config.tenant_names = []
+      end
+
       require 'highline/import'
 
       if ENV['SKIP_NAG'] or ENV['OVERWRITE'].to_s.downcase == 'true' or agree("This task will destroy any data in the database. Are you sure you want to \ncontinue? [y/n] ")
