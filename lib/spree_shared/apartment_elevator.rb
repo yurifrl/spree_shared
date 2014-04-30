@@ -23,6 +23,13 @@ module Apartment
 
             Rails.logger.error "  Using database '#{database}'"
 
+            Spree.config do |config|
+              # Example:
+              # Uncomment to override the default site name.
+              # config.site_name = "Spree Demo Site"
+              config.allow_ssl_in_production = false
+            end
+
             #set image location
             Spree::Image.change_paths database
 
