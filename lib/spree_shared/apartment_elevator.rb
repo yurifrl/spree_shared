@@ -20,7 +20,7 @@ module Apartment
             database.gsub! '-', '_'
 
             ActiveRecord::Base.establish_connection
-            result = ActiveRecord::Base.execute("SELECT id from public.customers where domain = '#{database}' and status = true")
+            result = ActiveRecord::Base.connection.execute("SELECT id from public.customers where domain = '#{database}' and status = true")
 
             if result.length > 0
 
