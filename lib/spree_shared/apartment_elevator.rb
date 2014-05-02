@@ -11,12 +11,8 @@ module Apartment
       def call(env)
         request = ActionDispatch::Request.new(env)
 
-        Rails.logger.error "  Requested URL: #{request.url}, subdomain: #{request.subdomain}, domain: #{request.domain}"
+        Rails.logger.error "  Requested URL: #{request.url}, subdomain: #{request.subdomain}, host: #{request.host}"
         domain = subdomain(request)
-
-        if !domain
-          domain = request.domain
-        end
 
         if domain
           #switch database
@@ -24,7 +20,7 @@ module Apartment
 
             ActiveRecord::Base.establish_connection
 
-            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where '#{domain}' = ANY(domains) and status = true")
+            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
 
             if result.ntuples > 0
               database = result.getvalue(0,0)
