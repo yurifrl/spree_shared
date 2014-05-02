@@ -65,8 +65,6 @@ module Apartment
       end
 
     end
-
-    ssh ec2-54-207-90-241.sa-east-1.compute.amazonaws.com
   end
 end
 
