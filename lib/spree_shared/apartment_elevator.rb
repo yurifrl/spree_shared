@@ -20,7 +20,7 @@ module Apartment
 
             ActiveRecord::Base.establish_connection
 
-            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where domains ilike '%#{domain}%' and status = true")
+            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where '#{domain}' = ANY(domains) and status = true")
 
             if result.ntuples > 0
               database = result.getvalue(0,0)
