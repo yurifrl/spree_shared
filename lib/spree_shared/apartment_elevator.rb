@@ -11,8 +11,12 @@ module Apartment
       def call(env)
         request = ActionDispatch::Request.new(env)
 
-        Rails.logger.error "  Requested URL: #{request.url}"
-        domain = request.subdomain
+        Rails.logger.error "  Requested URL: #{request.url}, subdomain: #{request.subdomain}, domain: #{request.domain}"
+        domain = subdomain(request)
+
+        if !domain
+          domain = request.domain
+        end
 
         if domain
           #switch database
@@ -58,6 +62,10 @@ module Apartment
         else
           ahh_no
         end
+      end
+
+      def subdomain(request)
+        request.subdomain.to_s.split('.').first
       end
 
       def ahh_no
