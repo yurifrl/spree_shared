@@ -12,18 +12,18 @@ module Apartment
         request = ActionDispatch::Request.new(env)
 
         Rails.logger.error "  Requested URL: #{request.url}"
-        database = subdomain(request)
+        domain = request.subdomain
 
-        if database
+        if domain
           #switch database
           begin
-            database.gsub! '-', '_'
 
             ActiveRecord::Base.establish_connection
-            result = ActiveRecord::Base.connection.execute("SELECT id from public.customers where domain = '#{database}' and status = true")
+
+            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where domains ilike '%#{domain}%' and status = true")
 
             if result.ntuples > 0
-
+              database = result.getvalue(0,0)
               Apartment::Database.switch database
 
               Rails.logger.error "  Using database '#{database}'"
@@ -36,7 +36,7 @@ module Apartment
               Spree::Image.change_paths database
 
               #namespace cache keys
-              ENV['RAILS_CACHE_ID']= database
+              ENV['RAILS_CACHE_ID'] = database
 
               #reset Mail settings
               Spree::Core::MailSettings.init
@@ -60,15 +60,13 @@ module Apartment
         end
       end
 
-      def subdomain(request)
-        request.subdomain.to_s.split('.').first
-      end
-
       def ahh_no
         [200, {"Content-type" => "text/html"}, ["Ahh No."]]
       end
 
     end
+
+    ssh ec2-54-207-90-241.sa-east-1.compute.amazonaws.com
   end
 end
 
