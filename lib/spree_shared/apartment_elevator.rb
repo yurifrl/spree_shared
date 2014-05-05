@@ -28,10 +28,6 @@ module Apartment
 
               Rails.logger.error "  Using database '#{database}'"
 
-              Spree.config do |config|
-                config.allow_ssl_in_production = false
-              end
-
               #set image location
               Spree::Image.change_paths database
 
