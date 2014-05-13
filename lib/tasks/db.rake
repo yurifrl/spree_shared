@@ -1,6 +1,6 @@
 namespace :spree_shared do
   desc "Bootstraps single database."
-  task :bootstrap, [:db_name] => [:environment] do |t, args|
+  task :bootstrap, [:db_name,:admin_email,:admin_password] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
@@ -62,8 +62,8 @@ namespace :spree_shared do
 
         #Need to manually create admin as it's not created by default in production mode
         if Rails.env.production?
-          password =  "spree123"
-          email =  "spree@example.com"
+          password =  args[:admin_password]
+          email =  args[:admin_email]
 
           unless Spree::User.find_by_email(email)
             admin = Spree::User.create(:password => password,
