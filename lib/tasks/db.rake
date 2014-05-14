@@ -6,7 +6,7 @@ namespace :spree_shared do
     else
       db_name = args[:db_name]
 
-      drop_schema = args[:drop_schema_if_exists] || false
+      drop_schema = args[:drop_schema_if_exists] == 'true'
 
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
@@ -87,6 +87,7 @@ namespace :spree_shared do
         end
 
       rescue Exception => e
+        puts e.message
         puts e.backtrace
       end
     end
