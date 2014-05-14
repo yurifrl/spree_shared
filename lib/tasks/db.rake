@@ -71,13 +71,13 @@ namespace :spree_shared do
 
           Spree::User.destroy_all(email: "spree@example.com")
 
-          admin = Spree::User.create(:password => password,
+          admin = Spree::User.create!(:password => password,
                                 :password_confirmation => password,
                                 :email => email,
                                 :login => email)
-          role = Spree::Role.find_or_create_by_name "admin"
+          role = Spree::Role.find_or_create_by_name! "admin"
           admin.spree_roles << role
-          admin.save
+          admin.save!
 
           puts "Bootstrap completed successfully"
         end
