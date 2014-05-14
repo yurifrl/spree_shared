@@ -1,10 +1,12 @@
 namespace :spree_shared do
   desc "Bootstraps single database."
-  task :bootstrap, [:db_name,:admin_email,:admin_password] => [:environment] do |t, args|
+  task :bootstrap, [:db_name,:admin_email,:admin_password,:drop_schema_if_exists] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
       db_name = args[:db_name]
+
+      drop_schema = args[:drop_schema_if_exists] || false
 
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
@@ -22,7 +24,14 @@ namespace :spree_shared do
 
       begin
         ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
-        ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
+        if !drop_schema
+          schema = ActiveRecord::Base.connection.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '#{db_name}'")
+          if schema.ntuples > 0
+            raise "Schema #{db_name} already exists. No action will be taken."
+          end
+        else
+          ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
+        end
         Apartment::Database.create db_name
       rescue Exception => e
         puts e.backtrace
@@ -71,7 +80,7 @@ namespace :spree_shared do
                                 :email => email,
                                 :login => email)
             role = Spree::Role.find_or_create_by_name "admin"
-            admin.roles << role
+            admin.spree_roles << role
             admin.save
           end
         end
@@ -81,40 +90,6 @@ namespace :spree_shared do
       end
     end
 
-  end
-
-  desc "Migrate schema to version 0 and back up again. WARNING: Destroys all data in tables!!"
-  task :remigrate, [:db_name] => [:environment] do |t,args|
-    if args[:db_name].blank?
-      puts %q{You must supply db_name, with "rake spree_shared:remigrate['the_db_name']"}
-    else
-      db_name = args[:db_name]
-
-      #convert name to postgres friendly name
-      db_name.gsub!('-','_')
-
-      Apartment.configure do |config|
-        config.tenant_names = []
-      end
-
-      require 'highline/import'
-
-      if ENV['SKIP_NAG'] or ENV['OVERWRITE'].to_s.downcase == 'true' or agree("This task will destroy any data in the database. Are you sure you want to \ncontinue? [y/n] ")
-        Apartment::Database.process(db_name) do
-          # Drop all tables
-          ActiveRecord::Base.connection.tables.each { |t| ActiveRecord::Base.connection.drop_table t }
-
-          # Migrate upward
-          Rake::Task["db:migrate"].invoke
-
-          # Dump the schema
-          Rake::Task["db:schema:dump"].invoke
-        end
-      else
-        say "Task cancelled."
-        exit
-      end
-    end
   end
 
   desc "Load sample into database"
@@ -134,13 +109,17 @@ namespace :spree_shared do
         Spree::Image.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
       end
+
+      Apartment::Database.process('public') do
+        ActiveRecord::Base.connection.execute()
+      end
     end
   end
 
-  desc "Seed data"
-  task :seed, [:db_name] => [:environment] do |t,args|
+  desc "Remove a store"
+  task :remove, [:db_name] => [:environment] do |t,args|
     if args[:db_name].blank?
-      puts %q{You must supply db_name, with "rake spree_shared:seed['the_db_name']"}
+      puts %q{You must supply db_name, with "rake spree_shared:remove['the_db_name']"}
     else
       db_name = args[:db_name]
       #convert name to postgres friendly name
@@ -150,10 +129,21 @@ namespace :spree_shared do
         config.tenant_names = []
       end
 
-      Apartment::Database.process(db_name) do
-        Rake::Task["db:seed"].invoke
+      config = YAML::load(File.open('config/database.yml'))
+      env = ENV["RAILS_ENV"] || "development"
+
+      if ENV['SKIP_NAG'] or ENV['OVERWRITE'].to_s.downcase == 'true' or agree("This task will completely destroy any data in the database, public and tenant directories concerning to this store. Are you sure you want to \ncontinue? [y/n] ")
+        ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
+        ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
+        ActiveRecord::Base.connection.execute("DELETE FROM public.customers where database = '#{db_name}'")
+        templates_base_path = File.join Rails.root, 'app', 'tenants', db_name
+        FileUtils.rm_r templates_base_path
+        public_path = File.join Rails.root, 'public', 'spree', db_name
+        FileUtils.rm_r public_path
+      else
+        say "Task cancelled."
+        exit
       end
     end
   end
-
 end
