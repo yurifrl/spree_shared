@@ -1,12 +1,13 @@
 namespace :spree_shared do
   desc "Bootstraps single database."
-  task :bootstrap, [:db_name,:admin_email,:admin_password,:drop_schema_if_exists] => [:environment] do |t, args|
+  task :bootstrap, [:db_name,:admin_email,:admin_password,:drop_schema_if_exists,:load_sample] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
       db_name = args[:db_name]
 
       drop_schema = args[:drop_schema_if_exists] == 'true'
+      load_sample = args[:load_sample] == 'true'
 
       #convert name to postgres friendly name
       db_name.gsub!('-','_')
@@ -78,6 +79,10 @@ namespace :spree_shared do
           role = Spree::Role.find_or_create_by_name! "admin"
           admin.spree_roles << role
           admin.save!
+
+          if load_sample
+            Rake::Task["spree_sample:load"].invoke
+          end
 
           puts "Bootstrap completed successfully"
         end
