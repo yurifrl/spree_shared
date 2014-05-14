@@ -66,24 +66,20 @@ namespace :spree_shared do
           store_name = db_name.humanize.titleize
           Spree::Config.set :site_name => store_name
 
-          #Need to manually create admin as it's not created by default in production mode
-          if Rails.env.production?
-            password =  args[:admin_password]
-            email =  args[:admin_email]
+          password =  args[:admin_password]
+          email =  args[:admin_email]
 
-            unless Spree::User.find_by_email(email)
-              admin = Spree::User.create(:password => password,
-                                  :password_confirmation => password,
-                                  :email => email,
-                                  :login => email)
-              role = Spree::Role.find_or_create_by_name "admin"
-              admin.spree_roles << role
-              admin.save
-            end
-          end
+          Spree::User.destroy_all(email: "spree@example.com")
+
+          admin = Spree::User.create(:password => password,
+                                :password_confirmation => password,
+                                :email => email,
+                                :login => email)
+          role = Spree::Role.find_or_create_by_name "admin"
+          admin.spree_roles << role
+          admin.save
 
           puts "Bootstrap completed successfully"
-
         end
 
       rescue Exception => e
