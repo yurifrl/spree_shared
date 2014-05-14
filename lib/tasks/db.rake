@@ -111,10 +111,6 @@ namespace :spree_shared do
         Spree::Image.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
       end
-
-      Apartment::Database.process('public') do
-        ActiveRecord::Base.connection.execute()
-      end
     end
   end
 
