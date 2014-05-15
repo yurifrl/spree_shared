@@ -131,7 +131,9 @@ namespace :spree_shared do
       config = YAML::load(File.open('config/database.yml'))
       env = ENV["RAILS_ENV"] || "development"
 
-      if ENV['SKIP_NAG'] or ENV['OVERWRITE'].to_s.downcase == 'true' or agree("This task will completely destroy any data in the database, public and tenant directories concerning to this store. Are you sure you want to \ncontinue? [y/n] ")
+      require 'highline/import'
+
+      if agree("This task will completely destroy any data in the database, public and tenant directories concerning to this store. Are you sure you want to \ncontinue? [y/n] ")
         ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
         ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
         ActiveRecord::Base.connection.execute("DELETE FROM public.customers where database = '#{db_name}'")
