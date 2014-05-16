@@ -138,9 +138,13 @@ namespace :spree_shared do
         ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
         ActiveRecord::Base.connection.execute("DELETE FROM public.customers where database = '#{db_name}'")
         templates_base_path = File.join Rails.root, 'app', 'tenants', db_name
-        FileUtils.rm_r templates_base_path
+        if Dir.exists? templates_base_path
+          FileUtils.rm_r templates_base_path
+        end
         public_path = File.join Rails.root, 'public', 'spree', db_name
-        FileUtils.rm_r public_path
+        if Dir.exists? public_path
+          FileUtils.rm_r public_path
+        end
       else
         say "Task cancelled."
         exit
