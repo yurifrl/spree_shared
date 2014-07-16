@@ -33,7 +33,7 @@ namespace :spree_shared do
         else
           ActiveRecord::Base.connection.execute("DROP SCHEMA IF EXISTS #{db_name} CASCADE")
         end
-        Apartment::Database.create db_name
+        Apartment::Tenant.create db_name
 
         puts "Creating asset directories"
 
@@ -56,7 +56,7 @@ namespace :spree_shared do
         #seed and sample it
         puts "Loading seed & sample data into database: #{db_name}"
         ENV['RAILS_CACHE_ID'] = db_name
-        Apartment::Database.process(db_name) do
+        Apartment::Tenant.process(db_name) do
           Spree::Image.change_paths db_name
 
           ENV['AUTO_ACCEPT'] = 'true'
@@ -108,7 +108,7 @@ namespace :spree_shared do
         config.tenant_names = []
       end
 
-      Apartment::Database.process(db_name) do
+      Apartment::Tenant.process(db_name) do
         Spree::Image.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
       end

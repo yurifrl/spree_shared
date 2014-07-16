@@ -24,7 +24,7 @@ module Apartment
 
             if result.ntuples > 0
               database = result.getvalue(0,0)
-              Apartment::Database.switch database
+              Apartment::Tenant.switch database
 
               Rails.logger.error "  Using database '#{database}'"
 
@@ -44,7 +44,7 @@ module Apartment
 
             #fallback
             ENV['RAILS_CACHE_ID'] = ""
-            Apartment::Database.switch nil
+            Apartment::Tenant.switch nil
             ActiveRecord::Base.establish_connection
             return ahh_no
           end
