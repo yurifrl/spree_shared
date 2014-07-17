@@ -1,13 +1,25 @@
 class AssetsController < ApplicationController
 
   def css
-    @css_contents = File.read(File.join(current_asset_path, "stylesheets", params[:file]))
-    render :text => @css_contents, :content_type => "text/css"
+    # Get contents
+    @file = get_path 'stylesheets', params[:file]
+    # Render
+    if !@file.nil?
+      render text: File.read(@file), content_type: 'text/css'
+    else
+      render nothing: true, status: 404
+    end
   end
 
   def js
-    @js_contents = File.read(File.join(current_asset_path, "javascripts", params[:file]))
-    render :js => @js_contents
+    # Get contents
+    @file = get_path 'javascripts', params[:file]
+    # Render
+    if !@file.nil?
+      render js: File.read(@file)
+    else
+      render nothing: true, status: 404
+    end
   end
 
   def img
@@ -17,7 +29,23 @@ class AssetsController < ApplicationController
       ".jpg" => "image/jpg",
       ".jpeg" => "image/jpeg"
     }
-    img_file = File.join(current_asset_path, "images", params[:file])
-    send_file img_file, type: content_types[File.extname(img_file)], disposition: "inline"
+    @file = get_path 'images', params[:file]
+    # Render
+    if !@file.nil?
+      send_file @file, type: content_types[File.extname(@file)], disposition: "inline"
+    else
+      render nothing: true, status: 404
+    end
   end
+
+  private
+
+    # Get the correct path for the file
+    def get_path(folder, file)
+      if File.exists? File.join(tenant_path, folder, file)
+        return File.join tenant_path, folder, file
+      end
+      nil
+    end
+
 end
