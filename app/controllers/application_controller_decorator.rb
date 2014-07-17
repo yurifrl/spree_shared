@@ -1,5 +1,8 @@
 ApplicationController.class_eval do
 
+  # Helper method
+  helper_method :tenant
+
   # View Path
   before_action do |controller|
     controller.prepend_view_path "#{tenant_path}/views"
