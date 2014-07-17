@@ -4,36 +4,6 @@ module SpreeShared
 
     config.autoload_paths += %W(#{config.root}/lib)
 
-    initializer "spree_shared.application_controller" do |app|
-      ::ApplicationController.class_eval do
-
-        before_filter :prepend_view_paths
-
-        def prepend_view_paths
-          if current_tenant.present?
-            prepend_view_path "app/tenants/#{current_tenant}/themes/#{current_theme}/views"
-          end
-        end
-
-        def current_tenant
-          if request.subdomain.present?
-            tenant = request.subdomain.gsub('-','_')
-          else
-            tenant = ""
-          end
-          tenant
-        end
-
-        def current_theme
-          session[:theme] || "basic"
-        end
-
-        def current_asset_path
-          File.join(Rails.root, 'app', 'tenants', current_tenant, 'themes', current_theme)
-        end
-      end
-    end
-
     # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
