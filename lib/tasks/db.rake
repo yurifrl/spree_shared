@@ -1,29 +1,29 @@
 namespace :spree_shared do
-  desc "Bootstraps single database."
-  task :bootstrap, [:db_name,:admin_email,:admin_password,:drop_schema_if_exists,:load_sample] => [:environment] do |t, args|
+  desc "Bootstraps single database. NOT"
+  task :bootstrap, [:db_name, :admin_email, :admin_password, :drop_schema_if_exists, :load_sample] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
-      db_name = args[:db_name]
-
-      drop_schema = args[:drop_schema_if_exists] == 'true'
-      load_sample = args[:load_sample] == 'true'
-
-      #convert name to postgres friendly name
-      db_name.gsub!('-','_')
-
-      #create the database
-      puts "Creating database: #{db_name}"
-
-      config = YAML::load(File.open('config/database.yml'))
-
-      env = ENV["RAILS_ENV"] || "development"
-
-      Apartment.configure do |config|
-        config.tenant_names = []
-      end
-
       begin
+        db_name = args[:db_name]
+
+        drop_schema = args[:drop_schema_if_exists] == 'true'
+        load_sample = args[:load_sample] == 'true'
+
+        #convert name to postgres friendly name
+        db_name.gsub!('-', '_')
+
+        #create the database
+        puts "Creating database: #{db_name}"
+
+        config = YAML::load(File.open('config/database.yml'))
+
+        env = ENV["RAILS_ENV"] || "development"
+
+        Apartment.configure do |config|
+          config.tenant_names = []
+        end
+
         ActiveRecord::Base.establish_connection(config[env]) #make sure we're talkin' to db
         if !drop_schema
           schema = ActiveRecord::Base.connection.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '#{db_name}'")
@@ -53,6 +53,11 @@ namespace :spree_shared do
         FileUtils.mkdir_p js unless File.exist? js
         FileUtils.touch File.join(js, "main.js")
 
+        public        = File.join Rails.root, 'public', 'yebo', db_name
+        public_tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
+        FileUtils.mkdir_p public unless File.exist? public
+        FileUtils.ln_s public, public_tenant, :force => true
+
         #seed and sample it
         puts "Loading seed & sample data into database: #{db_name}"
         ENV['RAILS_CACHE_ID'] = db_name
@@ -60,23 +65,23 @@ namespace :spree_shared do
           Spree::Image.change_paths db_name
 
           ENV['AUTO_ACCEPT'] = 'true'
-          ENV['SKIP_NAG'] = 'yes'
+          ENV['SKIP_NAG']    = 'yes'
 
           Rake::Task["db:seed"].invoke
 
           store_name = db_name.humanize.titleize
           Spree::Config.set :site_name => store_name
 
-          password =  args[:admin_password]
-          email =  args[:admin_email]
+          password = args[:admin_password]
+          email    = args[:admin_email]
 
           Spree::User.destroy_all(email: "spree@example.com")
 
-          admin = Spree::User.create!(:password => password,
-                                :password_confirmation => password,
-                                :email => email,
-                                :login => email)
-          role = Spree::Role.find_or_create_by_name! "admin"
+          admin = Spree::User.create!(:password              => password,
+                                      :password_confirmation => password,
+                                      :email                 => email,
+                                      :login                 => email)
+          role  = Spree::Role.find_or_create_by_name! "admin"
           admin.spree_roles << role
           admin.save!
 
@@ -96,13 +101,13 @@ namespace :spree_shared do
   end
 
   desc "Load sample into database"
-  task :load_sample, [:db_name] => [:environment] do |t,args|
+  task :load_sample, [:db_name] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:load_sample['the_db_name']"}
     else
       db_name = args[:db_name]
       #convert name to postgres friendly name
-      db_name.gsub!('-','_')
+      db_name.gsub!('-', '_')
 
       Apartment.configure do |config|
         config.tenant_names = []
@@ -116,20 +121,20 @@ namespace :spree_shared do
   end
 
   desc "Remove a store"
-  task :remove, [:db_name] => [:environment] do |t,args|
+  task :remove, [:db_name] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:remove['the_db_name']"}
     else
       db_name = args[:db_name]
       #convert name to postgres friendly name
-      db_name.gsub!('-','_')
+      db_name.gsub!('-', '_')
 
       Apartment.configure do |config|
         config.tenant_names = []
       end
 
       config = YAML::load(File.open('config/database.yml'))
-      env = ENV["RAILS_ENV"] || "development"
+      env    = ENV["RAILS_ENV"] || "development"
 
       require 'highline/import'
 
@@ -141,7 +146,7 @@ namespace :spree_shared do
         if Dir.exists? templates_base_path
           FileUtils.rm_r templates_base_path
         end
-        public_path = File.join Rails.root, 'public', 'spree', db_name
+        public_path = File.join Rails.root, 'public', 'yebo', db_name
         if Dir.exists? public_path
           FileUtils.rm_r public_path
         end
