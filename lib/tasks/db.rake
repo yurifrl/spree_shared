@@ -141,7 +141,7 @@ namespace :spree_shared do
         if Dir.exists? templates_base_path
           FileUtils.rm_r templates_base_path
         end
-        public_path = File.join Rails.root, 'public', 'spree', db_name
+        public_path = File.join Rails.root, 'public', 'yebo', db_name
         if Dir.exists? public_path
           FileUtils.rm_r public_path
         end
