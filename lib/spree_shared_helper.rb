@@ -8,7 +8,8 @@ class SpreeSharedHelper
     public_global = File.join Rails.root, 'public', 'yebo', db_name
     public_tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
 
-    FileUtils.mkdir_p public_global unless File.exist? public_global
-    FileUtils.ln_s public_global, public_tenant, :force => true unless File.exist? public_tenant
+    FileUtils.mkdir_p public_tenant unless File.exist? public_tenant
+    FileUtils.ln_s public_tenant, public_global, :force => true unless File.exist? public_global
+    ##              #SOURCE,      #DESTINY
   end
 end
