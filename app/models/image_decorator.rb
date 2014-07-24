@@ -6,5 +6,4 @@ module Spree
       Image.attachment_definitions[:attachment][:url]  = "/yebo/#{database}/products/:id/:style/:basename.:extension"
     end
   end
-
 end

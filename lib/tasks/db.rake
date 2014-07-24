@@ -53,10 +53,13 @@ namespace :spree_shared do
         FileUtils.mkdir_p js unless File.exist? js
         FileUtils.touch File.join(js, "main.js")
 
-        public_yebo   = File.join Rails.root, 'public', 'yebo', db_name
-        public_tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
-        FileUtils.mkdir_p public_yebo unless File.exist? public_yebo
-        FileUtils.ln_s public_yebo, public_tenant, :force => true
+        root          = File.join Rails.root
+        public_global = root, 'public', 'yebo', db_name
+        public_tenant = root, 'app', 'tenants', db_name, 'public'
+        unless File.exist? public_global
+          FileUtils.mkdir_p public_global
+          FileUtils.ln_s public_global, public_tenant, :force => true
+        end
 
         #seed and sample it
         puts "Loading seed & sample data into database: #{db_name}"
