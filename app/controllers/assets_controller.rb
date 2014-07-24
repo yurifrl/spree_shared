@@ -1,5 +1,4 @@
 class AssetsController < ApplicationController
-  # Confirm presence of public folder alias in tenant
 
   def css
     @css_contents = File.read(File.join(current_asset_path, "stylesheets", params[:file]))
