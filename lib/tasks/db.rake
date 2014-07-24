@@ -1,5 +1,5 @@
 namespace :spree_shared do
-  desc "Bootstraps single database. NOT"
+  desc "Bootstraps single database."
   task :bootstrap, [:db_name, :admin_email, :admin_password, :drop_schema_if_exists, :load_sample] => [:environment] do |t, args|
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
