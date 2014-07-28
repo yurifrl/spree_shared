@@ -1,5 +1,21 @@
 class AssetsController < ApplicationController
 
+  def font
+    content_types = {
+        ".eot" => "eot",
+        ".ttf" => "ttf",
+        ".svg" => "svg",
+        ".woff" => "woff",
+    }
+    @file = get_path 'fonts', params[:file]
+    # Render
+    if !@file.nil?
+      send_file @file, type: content_types[File.extname(@file)], disposition: "inline"
+    else
+      render nothing: true, status: 404
+    end
+  end
+
   def css
     # Get contents
     @file = get_path 'stylesheets', params[:file]
