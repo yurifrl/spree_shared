@@ -8,7 +8,11 @@ module Spree
     end
 
     def self.change_paths(database)
-      Image.attachment_definitions[:attachment][:path] = "#{ENV['PATH_TENANTS']}/#{database}/public/products/:id/:style/:basename.:extension"
+      if Rails.env == 'production'
+        Image.attachment_definitions[:attachment][:path] = "/home/ec2-user/yebo_tenants/#{database}/public/products/:id/:style/:basename.:extension"
+      else
+        Image.attachment_definitions[:attachment][:path] = ":rails_root/app/tenants/#{database}/public/products/:id/:style/:basename.:extension"
+      end
       Image.attachment_definitions[:attachment][:url]  = "/yebo/#{database}/products/:id/:style/:basename.:extension"
     end
   end
