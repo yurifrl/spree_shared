@@ -6,15 +6,18 @@ class SpreeSharedHelper
       db_name = tenant
     end
 
-    if Rails.env == 'production'
-      tenant = "#{ENV['PATH_TENANTS']}/#{db_name}/public"
-      yebo   = "#{ENV['PATH_PUBLIC']}/yebo"
-      global = "#{ENV['PATH_PUBLIC']}/yebo/#{db_name}"
-    else
-      tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
-      yebo   = File.join Rails.root, 'public', 'yebo'
-      global = File.join Rails.root, 'public', 'yebo', db_name
-    end
+    # if Rails.env == 'production'
+    #   tenant = "#{ENV['PATH_TENANTS']}/#{db_name}/public"
+    #   yebo   = "#{ENV['PATH_PUBLIC']}/yebo"
+    #   global = "#{ENV['PATH_PUBLIC']}/yebo/#{db_name}"
+    # else
+    #   tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
+    #   yebo   = File.join Rails.root, 'public', 'yebo'
+    #   global = File.join Rails.root, 'public', 'yebo', db_name
+    # end
+    tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
+    yebo   = File.join Rails.root, 'public', 'yebo'
+    global = File.join Rails.root, 'public', 'yebo', db_name
 
     FileUtils.mkdir_p tenant unless File.exist? tenant
     FileUtils.mkdir_p yebo unless File.exist? yebo
