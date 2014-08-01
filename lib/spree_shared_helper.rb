@@ -16,6 +16,12 @@ class SpreeSharedHelper
       global = File.join Rails.root, 'public', 'yebo', db_name
     end
 
+    p '$$$$$$$$$$$$$$'
+    p tenant
+    p yebo
+    p global
+    p '$$$$$$$$$$$$$$'
+
     FileUtils.mkdir_p tenant unless File.exist? tenant
     FileUtils.mkdir_p yebo unless File.exist? yebo
     FileUtils.ln_s tenant, global, :force => true unless File.exist? global
