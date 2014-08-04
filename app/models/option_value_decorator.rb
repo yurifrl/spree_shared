@@ -1,6 +1,6 @@
 #Makes image part db specific
 module Spree
-  Image.class_eval do
+  OptionValue.class_eval do
     # Upload in tenants
     before_save :confirm_public_folder
 
@@ -11,8 +11,8 @@ module Spree
     def self.change_paths(tenant)
       path = SpreeSharedHelper.tenants_path(tenant)
 
-      Image.attachment_definitions[:attachment][:path] = "#{path}/products/:id/:style/:basename.:extension"
-      Image.attachment_definitions[:attachment][:url]  = "/yebo/#{tenant}/products/:id/:style/:basename.:extension"
+      OptionValue.attachment_definitions[:image][:path] = "#{path}/option_values/:id/:style/:basename.:extension"
+      OptionValue.attachment_definitions[:image][:url]  = "/yebo/#{tenant}/option_values/:id/:style/:basename.:extension"
     end
   end
 end

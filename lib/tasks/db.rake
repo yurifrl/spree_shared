@@ -1,6 +1,8 @@
 namespace :spree_shared do
   desc "Bootstraps single database."
   task :bootstrap, [:db_name, :admin_email, :admin_password, :drop_schema_if_exists, :load_sample] => [:environment] do |t, args|
+    p '$$$$$$$$$$$$'
+    p 'HELLLO'
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
@@ -53,17 +55,14 @@ namespace :spree_shared do
         FileUtils.mkdir_p js unless File.exist? js
         FileUtils.touch File.join(js, "main.js")
 
-        # public        = File.join Rails.root, 'public', 'yebo', db_name
-        # public_tenant = File.join Rails.root, 'app', 'tenants', db_name, 'public'
-        # FileUtils.mkdir_p public unless File.exist? public
-        # FileUtils.ln_s public, public_tenant, :force => true unless File.exist? public_tenant
-        SpreeSharedHelper.confirm_public_alias_exists(db_name)
-
         #seed and sample it
         puts "Loading seed & sample data into database: #{db_name}"
         ENV['RAILS_CACHE_ID'] = db_name
         Apartment::Tenant.process(db_name) do
+          # Change Paths for file Upload in tenants
           Spree::Image.change_paths db_name
+          Spree::Banner.change_paths db_name
+          Spree::OptionValue.change_paths db_name
 
           ENV['AUTO_ACCEPT'] = 'true'
           ENV['SKIP_NAG']    = 'yes'
@@ -94,8 +93,8 @@ namespace :spree_shared do
         end
 
       rescue Exception => e
-        puts e.message
-        puts e.backtrace
+        p e.message
+        p e.backtrace
       end
     end
 
@@ -116,6 +115,8 @@ namespace :spree_shared do
 
       Apartment::Tenant.process(db_name) do
         Spree::Image.change_paths db_name
+        Spree::Banner.change_paths db_name
+        Spree::OptionValue.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
       end
     end

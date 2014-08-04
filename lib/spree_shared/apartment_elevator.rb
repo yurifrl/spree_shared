@@ -23,13 +23,15 @@ module Apartment
             result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
 
             if result.ntuples > 0
-              database = result.getvalue(0,0)
+              database = result.getvalue(0, 0)
               Apartment::Tenant.switch database
 
               Rails.logger.error "  Using database '#{database}'"
 
               #set image location
-              Spree::Image.change_paths database
+              Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
+              Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
+              Spree::OptionValue.change_paths database rescue p 'OptionValue  Class Was not loaded'
 
               #namespace cache keys
               ENV['RAILS_CACHE_ID'] = database
