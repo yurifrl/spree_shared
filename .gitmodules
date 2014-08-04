@@ -1,0 +1,3 @@
+[submodule "azpay"]
+	path = azpay
+	url = git@git.cloudhost.io:yebo_dev/azpay.git
