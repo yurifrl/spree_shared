@@ -16,10 +16,10 @@ class SpreeSharedHelper
 
   #ENV['PATH_TENANTS']
   def self.tenants_path(tenant)
-    Rails.env == 'production' ? File.join('home', 'ec2-user', 'yebo_tenants') : File.join(Rails.root, 'app', 'tenants', tenant, 'public')
+    Rails.env == 'production' ? File.join('/', 'home', 'ec2-user', 'yebo_tenants') : File.join(Rails.root, 'app', 'tenants', tenant, 'public')
   end
 
   def self.public_path
-    Rails.env == 'production' ? File.join('home', 'ec2-user', 'yebo_public') : File.join(Rails.root, 'public')
+    Rails.env == 'production' ? File.join('/', 'home', 'ec2-user', 'yebo_public') : File.join(Rails.root, 'public')
   end
 end
