@@ -1,8 +1,6 @@
 namespace :spree_shared do
   desc "Bootstraps single database."
   task :bootstrap, [:db_name, :admin_email, :admin_password, :drop_schema_if_exists, :load_sample] => [:environment] do |t, args|
-    p '$$$$$$$$$$$$'
-    p 'HELLLO'
     if args[:db_name].blank?
       puts %q{You must supply db_name, with "rake spree_shared:bootstrap['the_db_name']"}
     else
@@ -18,7 +16,7 @@ namespace :spree_shared do
         #create the database
         puts "Creating database: #{db_name}"
 
-        config = YAML::load(File.open('config/database.yml'))
+        config = YAML::load( ERB.new( File.read('config/database.yml') ).result  )
 
         env = ENV["RAILS_ENV"] || "development"
 
