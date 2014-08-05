@@ -58,9 +58,9 @@ namespace :spree_shared do
         ENV['RAILS_CACHE_ID'] = db_name
         Apartment::Tenant.process(db_name) do
           # Change Paths for file Upload in tenants
-          Spree::Image.change_paths db_name
-          Spree::Banner.change_paths db_name
-          Spree::OptionValue.change_paths db_name
+          Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
+          Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
+          Spree::OptionValue.change_paths database rescue p 'OptionValue  Class Was not loaded'
 
           ENV['AUTO_ACCEPT'] = 'true'
           ENV['SKIP_NAG']    = 'yes'
