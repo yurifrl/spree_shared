@@ -133,7 +133,7 @@ namespace :spree_shared do
         config.tenant_names = []
       end
 
-      config = YAML::load(File.open('config/database.yml'))
+      config = YAML::load( ERB.new( File.read('config/database.yml') ).result  )
       env    = ENV["RAILS_ENV"] || "development"
 
       require 'highline/import'
