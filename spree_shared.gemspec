@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.date = "2014-03-21"
   s.description = "Adds multi-tenancy to a Spree application using the Apartment gem."
   s.email = "brian@spreecommerce.com"
-  s.files = [".gitignore", ".rspec", "Gemfile", "Gemfile.lock", "LICENSE", "README.md", "Rakefile", "Versionfile", "app/models/image_decorator.rb", "app/overrides/change_public_file_path.rb", "app/overrides/replace_layout_scripts.rb", "lib/spree_shared.rb", "lib/spree_shared/apartment_elevator.rb", "lib/spree_shared/engine.rb", "lib/spree_shared/spree_preferences_extensions.rb", "lib/tasks/db.rake", "license.md", "script/rails", "spec/spec_helper.rb", "spree_shared.gemspec"]
+  s.files = [".gitignore", ".rspec", "Gemfile", "LICENSE", "README.md", "Rakefile", "Versionfile", "app/models/image_decorator.rb", "app/overrides/change_public_file_path.rb", "app/overrides/replace_layout_scripts.rb", "lib/spree_shared.rb", "lib/spree_shared/apartment_elevator.rb", "lib/spree_shared/engine.rb", "lib/spree_shared/spree_preferences_extensions.rb", "lib/tasks/db.rake", "license.md", "script/rails", "spec/spec_helper.rb", "spree_shared.gemspec"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.9.2")
   s.requirements = ["none"]
   s.rubygems_version = "2.2.2"
