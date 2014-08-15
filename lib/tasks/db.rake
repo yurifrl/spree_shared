@@ -61,6 +61,7 @@ namespace :spree_shared do
           Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
           Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
           Spree::OptionValue.change_paths database rescue p 'OptionValue  Class Was not loaded'
+          Ckeditor.change_paths database rescue p 'Ckeditor  Class Was not loaded'
 
           ENV['AUTO_ACCEPT'] = 'true'
           ENV['SKIP_NAG']    = 'yes'
