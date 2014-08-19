@@ -29,8 +29,8 @@ module Apartment
               Rails.logger.error "  Using database '#{database}'"
 
               #set image location
-              Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
-              Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
+              Spree::Image.change_paths database rescue  ''
+              Spree::Banner.change_paths database rescue  ''
               Spree::OptionValue.change_paths database rescue ''
               Ckeditor.change_paths database rescue ''
 
