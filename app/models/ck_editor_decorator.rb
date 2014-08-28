@@ -1,6 +1,6 @@
 #Makes image part db specific
 module Ckeditor
-  Picture.class_eval do
+  Picture.try(:class_eval) do
     # Upload in tenants
     before_save :confirm_public_folder
 
@@ -16,7 +16,7 @@ module Ckeditor
     end
   end
 
-  AttachmentFile.class_eval do
+  AttachmentFile.try(:class_eval) do
     # Upload in tenants
     before_save :confirm_public_folder
 

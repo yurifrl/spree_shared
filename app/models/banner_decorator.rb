@@ -1,6 +1,6 @@
 #Makes image part db specific
 module Spree
-  Banner.class_eval do
+  Banner.try(:class_eval) do
     # Upload in tenants
     before_save :confirm_public_folder
 
