@@ -31,8 +31,6 @@ module Apartment
               #set image location
               Spree::Image.change_paths database rescue  ''
               Spree::Banner.change_paths database rescue  ''
-              Spree::OptionValue.change_paths database rescue ''
-              Ckeditor.change_paths database rescue ''
 
               #namespace cache keys
               ENV['RAILS_CACHE_ID'] = database
