@@ -19,6 +19,7 @@ module Apartment
           begin
 
             #ActiveRecord::Base.establish_connection
+            Rails.logger.error request.inspect
             if(request.session[request.host])
               switch(request.session[request.host])
             else 
