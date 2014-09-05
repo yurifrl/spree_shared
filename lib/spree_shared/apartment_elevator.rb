@@ -19,26 +19,18 @@ module Apartment
           begin
 
             #ActiveRecord::Base.establish_connection
-
-            result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
-
-            if result.ntuples > 0
-              database = result.getvalue(0, 0)
-              Apartment::Tenant.switch database
-
-              Rails.logger.error "  Using database '#{database}'"
-
-              #set image location
-              Spree::Image.change_paths database rescue  ''
-              Spree::Banner.change_paths database rescue  ''
-
-              #namespace cache keys
-              ENV['RAILS_CACHE_ID'] = database
-
-              #reset Mail settings
-              Spree::Core::MailSettings.init
-            else
-              raise "Client is not active"
+            if(request.session[request.host])
+              switch(request.session[request.host])
+            else 
+              result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
+  
+              if result.ntuples > 0
+                database = result.getvalue(0, 0)
+                request.session[request.host] = database
+                switch(database)
+              else
+                raise "Client is not active"
+              end
             end
           rescue Exception => e
             Rails.logger.error "  Stopped request due to: #{e.message}"
@@ -55,6 +47,22 @@ module Apartment
         else
           ahh_no
         end
+      end
+      
+      def switch(database)
+        Apartment::Tenant.switch database
+
+        Rails.logger.error "  Using database '#{database}'"
+
+        #set image location
+        Spree::Image.change_paths database rescue  ''
+        Spree::Banner.change_paths database rescue  ''
+
+        #namespace cache keys
+        ENV['RAILS_CACHE_ID'] = database
+
+        #reset Mail settings
+        Spree::Core::MailSettings.init
       end
 
       def subdomain(request)
