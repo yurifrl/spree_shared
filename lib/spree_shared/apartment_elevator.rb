@@ -18,7 +18,7 @@ module Apartment
           #switch database
           begin
 
-            ActiveRecord::Base.establish_connection
+            #ActiveRecord::Base.establish_connection
 
             result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
 
@@ -29,9 +29,8 @@ module Apartment
               Rails.logger.error "  Using database '#{database}'"
 
               #set image location
-              Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
-              Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
-              Spree::OptionValue.change_paths database rescue p 'OptionValue  Class Was not loaded'
+              Spree::Image.change_paths database rescue  ''
+              Spree::Banner.change_paths database rescue  ''
 
               #namespace cache keys
               ENV['RAILS_CACHE_ID'] = database
@@ -47,7 +46,7 @@ module Apartment
             #fallback
             ENV['RAILS_CACHE_ID'] = ""
             Apartment::Tenant.switch nil
-            ActiveRecord::Base.establish_connection
+            #ActiveRecord::Base.establish_connection
             return ahh_no
           end
 

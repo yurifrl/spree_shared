@@ -60,7 +60,6 @@ namespace :spree_shared do
           # Change Paths for file Upload in tenants
           Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
           Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
-          Spree::OptionValue.change_paths database rescue p 'OptionValue  Class Was not loaded'
 
           ENV['AUTO_ACCEPT'] = 'true'
           ENV['SKIP_NAG']    = 'yes'
@@ -133,7 +132,7 @@ namespace :spree_shared do
         config.tenant_names = []
       end
 
-      config = YAML::load(File.open('config/database.yml'))
+      config = YAML::load( ERB.new( File.read('config/database.yml') ).result  )
       env    = ENV["RAILS_ENV"] || "development"
 
       require 'highline/import'
