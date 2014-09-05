@@ -18,7 +18,7 @@ module Apartment
           #switch database
           begin
 
-            ActiveRecord::Base.establish_connection
+            #ActiveRecord::Base.establish_connection
 
             result = ActiveRecord::Base.connection.execute("SELECT database from public.customers where ('#{domain}' = ANY(domains) OR '#{request.host}' = ANY(domains)) and status = true")
 
@@ -46,7 +46,7 @@ module Apartment
             #fallback
             ENV['RAILS_CACHE_ID'] = ""
             Apartment::Tenant.switch nil
-            ActiveRecord::Base.establish_connection
+            #ActiveRecord::Base.establish_connection
             return ahh_no
           end
 
