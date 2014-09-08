@@ -57,9 +57,6 @@ namespace :spree_shared do
         puts "Loading seed & sample data into database: #{db_name}"
         ENV['RAILS_CACHE_ID'] = db_name
         Apartment::Tenant.process(db_name) do
-          # Change Paths for file Upload in tenants
-          Spree::Image.change_paths database rescue p 'Image Class Was not loaded'
-          Spree::Banner.change_paths database rescue p 'Banner Class Was not loaded'
 
           ENV['AUTO_ACCEPT'] = 'true'
           ENV['SKIP_NAG']    = 'yes'
@@ -109,11 +106,10 @@ namespace :spree_shared do
       Apartment.configure do |config|
         config.tenant_names = []
       end
-
+      # Change Paths for file Upload in tenants
       Apartment::Tenant.process(db_name) do
         Spree::Image.change_paths db_name
         Spree::Banner.change_paths db_name
-        Spree::OptionValue.change_paths db_name
         Rake::Task["spree_sample:load"].invoke
       end
     end
