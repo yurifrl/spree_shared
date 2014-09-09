@@ -24,4 +24,9 @@ class SpreeSharedHelper
     #Rails.env == 'production' ? File.join('/', 'home', 'ec2-user', 'yebo_public') : File.join(Rails.root, 'public')
     File.join(Rails.root, 'public')
   end
+
+  def self.run_evals
+    Spree::Image.change_paths Apartment::Tenant.current rescue  p 'Image Not loaded'
+    Spree::Banner.change_paths Apartment::Tenant.current rescue  p 'Banner Not loaded'
+  end
 end
